@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>商家页</title>
+<title>商家页面</title>
 
 </head>
 <body>
