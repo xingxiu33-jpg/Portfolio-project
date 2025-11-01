@@ -61,7 +61,7 @@ public class LoginServlet extends HttpServlet {
 	                    response.sendRedirect("merchant_dashboard.jsp");
 	                } else {
 	                    // 其他类型 (如果有)
-	                    response.sendRedirect("index.jsp");
+	                    response.sendRedirect("login.jsp");
 	                }
 	                
 	            } else {
