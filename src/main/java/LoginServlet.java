@@ -53,6 +53,8 @@ public class LoginServlet extends HttpServlet {
 	                HttpSession session = request.getSession();
 	                session.setAttribute("username", username);
 	                session.setAttribute("user_type", storedUserType); // 关键！
+	                //  设置Session的超时时间，比如30分钟
+	                session.setMaxInactiveInterval(30 * 60);
 	                
 	                // 4. 核心逻辑：根据用户类型重定向
 	                if ("user".equals(storedUserType)) {

@@ -24,7 +24,7 @@
     }
 %>
 <a href="merchantProfile">编辑我的资料</a>
-
+<a href="LogoutServlet">退出登录</a>
 
 </body>
 </html>
