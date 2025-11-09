@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%-- 引入国际化配置文件 --%>
+<%@ include file="/WEB-INF/common/i18n_setup.jspf" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,7 +29,7 @@
 
 <h2>注册</h2>
 <form id="registerForm" action="./Register" method="post" >
-		<p>username:<input type="text" name="username"></p>
+		<p><fmt:message key="label.username" /><input type="text" name="username"></p>
 		<div class="form-group">
                 <label for="reg_password">密码:</label>
                 <input type="password" id="reg_password" name="password" required>

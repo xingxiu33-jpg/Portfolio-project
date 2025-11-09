@@ -1,0 +1,17 @@
+<%-- 
+  i18n_setup.jspf (JSP 国际化配置片段)
+
+  1. 引入所有必需的 JSTL 标签库
+  2. 检查 URL 参数 "lang"，并将其设置到 Session 中
+  3. 从 Session 中读取语言设置，并应用到 JSTL
+  4. 指定资源包 (messages.properties)
+--%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<c:if test="${not empty param.lang}">
+    <c:set var="language" value="${param.lang}" scope="session" />
+</c:if>
+
+<fmt:setLocale value="${sessionScope.language}" />
+<fmt:setBundle basename="messages" />
