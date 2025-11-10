@@ -1,17 +1,70 @@
 <%-- 
-  i18n_setup.jspf (JSP 国际化配置片段)
+  i18n_setup.jspf (JSP 国际化配置片段 - Cookie 版本)
 
-  1. 引入所有必需的 JSTL 标签库
-  2. 检查 URL 参数 "lang"，并将其设置到 Session 中
-  3. 从 Session 中读取语言设置，并应用到 JSTL
-  4. 指定资源包 (messages.properties)
+  1. 引入 JSTL 标签库
+  2. (使用 Scriptlet) 检查 URL 参数 "lang"，如果存在，则创建/更新 Cookie
+  3. (使用 JSTL) 按优先级加载语言：
+     - 优先1: URL 参数 (用户刚点击切换)
+     - 优先2: Cookie (用户的持久化偏好)
+     - 优先3: 默认语言 (e.g., 'en')
+  4. 将确定的语言应用到 <fmt>
+  5. 指定资源包
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page import="java.net.URLEncoder" %> <%-- 导入 Java 类 --%>
 
+<%-- 
+  步骤 2: 处理语言切换 (写入 Cookie)
+  如果 URL 中有 'lang' 参数, 说明用户正在主动切换语言.
+  我们必须使用 Java Scriptlet 来创建 Cookie.
+--%>
 <c:if test="${not empty param.lang}">
-    <c:set var="language" value="${param.lang}" scope="session" />
+    <%
+        // 获取从 URL 传入的语言值
+        String langValue = request.getParameter("lang");
+        
+        // (推荐) 在这里可以添加一个白名单验证 langValue, 确保其安全
+        
+        // 创建 Cookie
+        Cookie langCookie = new Cookie("user_lang", URLEncoder.encode(langValue, "UTF-8"));
+        
+        // 设置 Cookie 的有效期 (例如: 30天)
+        langCookie.setMaxAge(30 * 24 * 60 * 60); 
+        
+        // 设置 Cookie 的路径为 "/"，使其在整个网站都有效
+        langCookie.setPath("/"); 
+        
+        // 将 Cookie 添加到响应中
+        response.addCookie(langCookie);
+    %>
 </c:if>
 
-<fmt:setLocale value="${sessionScope.language}" />
+<%-- 
+  步骤 3: 加载语言设置 (读取 Cookie)
+  按优先级确定当前页面应使用的语言
+--%>
+<c:choose>
+	<%-- 如果网址里面有lang ，那就根据这个值判断显示什么语言 --%>
+    <c:when test="${not empty param.lang}">
+        <%-- 优先1: 用户刚点击了切换链接 (param.lang) --%>
+        <c:set var="current_lang" value="${param.lang}" />
+    </c:when>
+    <%-- 如果网址里没lang，那就需要去cookie里面看现在是什么语言 --%>
+    <c:when test="${not empty cookie.user_lang.value}">
+        <%-- 优先2: 'cookie' 是 JSTL 隐式对象, 'user_lang' 是我们上面设置的 Cookie 名字 --%>
+        <c:set var="current_lang" value="${cookie.user_lang.value}" />
+    </c:when>
+    <%-- 如果网址和cookie都没有，那就用默认语言 --%>
+    <c:otherwise>
+        <%-- 优先3: 默认语言 (如果 URL 和 Cookie 都没有) --%>
+        <c:set var="current_lang" value="ja" /> <%-- 你可以在此设置默认语言, 比如 'zh' --%>
+    </c:otherwise>
+</c:choose>
+
+<%-- 
+  步骤 4 & 5: 应用设置
+  将最终确定的 'current_lang' 应用到 <fmt> 标签.
+--%>
+<fmt:setLocale value="${current_lang}" />
 <fmt:setBundle basename="messages" />
