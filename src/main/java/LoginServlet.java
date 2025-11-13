@@ -37,7 +37,7 @@ public class LoginServlet extends HttpServlet {
 	        // -----------------------------------------------
 	        // 操作 1：插入数据到 'users' 表
 	        // -----------------------------------------------
-	        String sql = "SELECT password_hash, user_type FROM accounts WHERE username = ?;";
+	        String sql = "SELECT id, password_hash, user_type FROM accounts WHERE username = ?;";
 	        pstmt = conn.prepareStatement(sql);
 	        pstmt.setString(1, username);
 	       
@@ -46,12 +46,14 @@ public class LoginServlet extends HttpServlet {
 	            // 2. 找到用户，验证密码
 	            String storedHash = rs.getString("password_hash");
 	            String storedUserType = rs.getString("user_type");
-	            
+	            int accountId = rs.getInt("id");
+
 	            // 必须使用相同的哈希算法验证
 	            if (PasswordUtil.hashPassword(pass).equals(storedHash)) {
 	                // 3. 密码正确，创建 Session
 	                HttpSession session = request.getSession();
 	                session.setAttribute("username", username);
+	                session.setAttribute("account_id", accountId);
 	                session.setAttribute("user_type", storedUserType); // 关键！
 	                //  设置Session的超时时间，比如30分钟
 	                session.setMaxInactiveInterval(30 * 60);
